@@ -1,0 +1,132 @@
+﻿@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var dailyLabels = Model.DailyNewVictims.Select(x => x.Key.ToString("dd/MM")).ToList();
+    var dailyData = Model.DailyNewVictims.Select(x => x.Value).ToList();
+}
+
+<div class="container-fluid">
+    <!-- İstatistik Kartları -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Toplam Kurban</h5>
+                    <h2>@Model.TotalVictims</h2>
+                    <small>Son 24 saatte: +@Model.NewVictimsLast24h</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Şifrelenmiş Dosyalar</h5>
+                    <h2>@Model.TotalEncryptedFiles</h2>
+                    <small>Toplam şifrelenmiş dosya</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>Ödeme Yapanlar</h5>
+                    <h2>@Model.TotalPaidVictims</h2>
+                    <small>Toplam ödeme yapan kurban</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5>Başarı Oranı</h5>
+                    <h2>@(Model.TotalVictims > 0 ? $"{(Model.TotalPaidVictims * 100.0 / Model.TotalVictims):F1}%" : "0%")</h2>
+                    <small>Ödeme yapanların oranı</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grafik ve Aktiviteler -->
+    <div class="row">
+        <!-- Günlük Yeni Kurban Grafiği -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Son 7 Gün - Yeni Kurbanlar</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="victimChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Son Aktiviteler -->
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Son Aktiviteler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="activity-feed">
+                        @foreach (var activity in Model.RecentActivities)
+                        {
+                            <div class="activity-item">
+                                <small class="text-muted">@activity.created_at.ToString("dd/MM/yyyy HH:mm")</small>
+                                <p class="mb-0">@activity.username - @activity.action</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('victimChart').getContext('2d');
+        var labels = @Html.Raw(Json.Serialize(dailyLabels));
+        var data = @Html.Raw(Json.Serialize(dailyData));
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Yeni Kurbanlar',
+                    data: data,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .activity-feed {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .activity-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+}

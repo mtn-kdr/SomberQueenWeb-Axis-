@@ -1,0 +1,30 @@
+@model SomberQueenWeb_Axis_.Models.EncryptedFile
+
+<h1>Dosya Detayları</h1>
+
+<table class="table">
+    <tr>
+        <th>Dosya ID</th>
+        <td>@Model.id</td>
+    </tr>
+    <tr>
+        <th>Dosya Adı</th>
+        <td>@Model.file_name</td>
+    </tr>
+    <tr>
+        <th>Kullanıcı Adı</th>
+        <td>@Model.username</td>
+    </tr>
+    <tr>
+        <th>Kullanıcı ID</th>
+        <td>@Model.user_id</td>
+    </tr>
+    <tr>
+        <th>Oluşturulma Tarihi</th>
+        <td>@Model.created_at.ToString("dd/MM/yyyy HH:mm")</td>
+    </tr>
+</table>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-primary">Geri Dön</a>
+</div>

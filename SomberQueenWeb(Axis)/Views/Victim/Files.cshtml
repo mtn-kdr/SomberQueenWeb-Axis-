@@ -1,0 +1,69 @@
+@model IEnumerable<EncryptedFile>
+@{
+    ViewData["Title"] = "Şifrelenmiş Dosyalar";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-lock"></i> Şifrelenmiş Dosyalarınız
+            </h4>
+        </div>
+        <div class="card-body">
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">
+                    Henüz şifrelenmiş dosya bulunmamaktadır.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover" id="filesTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Dosya Adı</th>
+                                <th>Şifrelenme Tarihi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var file in Model)
+                            {
+                                <tr>
+                                    <td>@file.id</td>
+                                    <td>
+                                        <i class="fas fa-file text-secondary"></i>
+                                        @file.file_name
+                                    </td>
+                                    <td>@file.created_at.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-3">
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Önemli Uyarı</h5>
+                        <p>Dosyalarınızı kurtarmak için ödeme yapmanız gerekmektedir.</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#filesTable').DataTable({
+                "order": [[0, "desc"]],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json"
+                }
+            });
+        });
+    </script>
+} 
